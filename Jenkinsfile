@@ -1,33 +1,44 @@
-pipeline{
+pipeline {
     agent any
-    environment{
-        NEW_VERSION = '0.1.0'
-        SERVER_CREDENTIALS = credentials('server_credentials')
+    parameters {
+        choice(name: 'VERSION', choices: ['1.1.0', '1.2.0', '1.3.0'], description: '')
+        booleanParam(name: 'executeTests', defaultValue: true, description: '')
     }
-    stages{
-        stage("build"){
-            steps{
-                echo "========executing build========"
-                echo "building version ${NEW_VERSION}"
-            }
-        }
-        stage("test"){
-            when{
-                expression{
-                    BRANCH_NAME == 'develop'
+    stages {
+        stage("init") {
+            steps {
+                script {
+                   gv = load "script.groovy" 
                 }
             }
-            steps{
-                echo "========executing test========"
+        }
+        stage("build") {
+            steps {
+                script {
+                    gv.buildApp()
+                }
             }
         }
-        stage("deploy"){
-            steps{
-                echo "========executing deploy========"
-                echo "deploying with ${SERVER_CREDENTIALS}
+        stage("test") {
+            when {
+                expression {
+                    params.executeTests
+                }
+            }
+            steps {
+                script {
+                    gv.testApp()
+                }
             }
         }
-    }
+        stage("deploy") {
+            steps {
+                script {
+                    gv.deployApp()
+                }
+            }
+        }
+    }   
     post{
         always{
             echo "========always========"
