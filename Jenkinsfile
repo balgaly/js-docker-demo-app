@@ -1,15 +1,14 @@
 pipeline{
     agent any
-
+    environment{
+        NEW_VERSION = '0.1.0'
+        SERVER_CREDENTIALS = credentials('credentials test)
+    }
     stages{
         stage("build"){
             steps{
                 echo "========executing build========"
-            }
-        }
-        stage("deploy"){
-            steps{
-                echo "========executing deploy========"
+                echo "building version ${NEW_VERSION}"
             }
         }
         stage("test"){
@@ -20,6 +19,12 @@ pipeline{
             }
             steps{
                 echo "========executing test========"
+            }
+        }
+        stage("deploy"){
+            steps{
+                echo "========executing deploy========"
+                echo "deploying with ${SERVER_CREDENTIALS}
             }
         }
     }
@@ -38,18 +43,17 @@ pipeline{
 
 /*
 To start a jenkins server with docker
-run:
-docker run \
-  --name jenkins-blueocean \
-  --rm \
-  --detach \
-  --network jenkins \
-  --env DOCKER_HOST=tcp://docker:2376 \
-  --env DOCKER_CERT_PATH=/certs/client \
-  --env DOCKER_TLS_VERIFY=1 \
-  --publish 8080:8080 \
-  --publish 50000:50000 \
-  --volume jenkins-data:/var/jenkins_home \
-  --volume jenkins-docker-certs:/certs/client:ro \
-  balgaly/myjenkins:1.2  
+
+run jenkins container 
+if you want a fresh start -> 'docker volume rm jenkins_home'
+    docker run -p 8080:8080 -p 50000:50000 -d -v jenkins_home:/var/jenkins_home jenkins/jenkins:lts
+
+
+
+
+
+
+
+
+
 */
